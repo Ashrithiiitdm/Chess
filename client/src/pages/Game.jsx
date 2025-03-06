@@ -10,6 +10,7 @@ export default function Game() {
 	const socket = useSocket();
 	const [chess, setChess] = useState(new Chess());
 	const [board, setBoard] = useState(chess.board());
+	const [started, setStarted] = useState(false);
 
 	useEffect(() => {
 		if (!socket) {
@@ -23,6 +24,7 @@ export default function Game() {
 			switch (message.type) {
 				case "create_game":
 					setBoard(chess.board());
+					setStarted(true);
 					console.log("Game created");
 					break;
 
@@ -68,13 +70,15 @@ export default function Game() {
 					</div>
 					<div className="col-span-2 bg-green-200 w-full flex justify-center">
 						<div className="pt-8">
-							<Button
-								onClick={() =>
-									socket.send(JSON.stringify({ type: "create_game" }))
-								}
-							>
-								Play Online
-							</Button>
+							{!started && (
+								<Button
+									onClick={() =>
+										socket.send(JSON.stringify({ type: "create_game" }))
+									}
+								>
+									Play Online
+								</Button>
+							)}
 						</div>
 					</div>
 				</div>

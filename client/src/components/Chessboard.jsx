@@ -49,7 +49,16 @@ export default function Chessboard({ chess, setBoard, socket, board }) {
 								>
 									<div className="w-full justify-center flex h-full">
 										<div className="h-full justify-center flex flex-col">
-											{square ? square.type : ""}
+											{square ? (
+												<img
+													className="w-10"
+													src={`/${
+														square?.color === "b"
+															? `b${square?.type}.png`
+															: `w${square?.type}.png`
+													}`}
+												/>
+											) : null}
 										</div>
 									</div>
 								</div>
