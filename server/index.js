@@ -1,28 +1,44 @@
-import { createServer } from "http";
+import express from "express";
+import http from "http";
 import { Server } from "socket.io";
+import cors from "cors";
+import dotenv from "dotenv";
+import GameManager from "./controllers/gameManager.js";
+dotenv.config();
 
-const httpServer = createServer();
-const io = new Server(httpServer, {
+const port = process.env.PORT;
+
+const app = express();
+
+app.use(express.json());
+app.use(
+	cors({
+		origin: "*",
+	})
+);
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
 	cors: {
-		origin: "*", // Allow all origins for debugging
-		methods: ["GET", "POST", "PUT", "DELETE"],
+		origin: "*",
+		methods: ["GET", "POST"],
 	},
 });
 
-console.log("🚀 Server started, waiting for connections...");
+const gameManager = new GameManager();
 
 io.on("connection", (socket) => {
-	console.log("✅ New user connected:", socket.id);
+	console.log("User connected :", socket.id);
+
+	gameManager.addUser(socket);
 
 	socket.on("disconnect", () => {
-		console.log("❌ User disconnected:", socket.id);
-	});
-
-	socket.on("message", (data) => {
-		console.log("Received message:", data, "from", socket.id);
+		gameManager.removeUser(socket);
+		console.log("User disconnected :", socket.id);
 	});
 });
 
-httpServer.listen(8080, () => {
-	console.log("✅ Server listening on port 8080");
+server.listen(port, () => {
+	console.log("Server is listening at port :", port);
 });
